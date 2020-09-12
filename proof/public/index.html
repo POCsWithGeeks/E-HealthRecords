@@ -4,17 +4,41 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <title>Document loading</title>
+    <title>File upload Ipfs</title>
+    <link rel="stylesheet" type="text/css" href="main.css" />
   </head>
   <body>
-    <h3>Load the json file</h3>
-    <form action="/profile" method="post" enctype="multipart/form-data">
-      <input type="file" name="avatar" />
-      <button>submit</button>
-    </form>
-    <br />
-    <input id="fileHash" type="text" />
-    <button onclick="loadDoc()">download</button>
+    <div class="container">
+      <h3>Upload the json/any file</h3>
+      <form action="/profile" method="post" enctype="multipart/form-data">
+        <div class="form-group">
+          <label id="name-label" for="name">Upload the files :</label>
+          <input type="file" name="avatar" />
+        </div>
+
+        <div class="form-group">
+          <button type="submit" id="submit" class="submit-button">
+            Submit
+          </button>
+        </div>
+      </form>
+      <br />
+      <div class="form-group">
+        <label id="name-label" for="name">Query Hash</label>
+        <input id="fileHash" type="text" />
+      </div>
+
+      <div class="form-group">
+        <button
+          onclick="loadDoc()"
+          type="submit"
+          id="submit"
+          class="submit-button"
+        >
+          Download
+        </button>
+      </div>
+    </div>
   </body>
   <script>
     function loadDoc() {

@@ -1,12 +1,12 @@
 const express = require("express");
 const app = express();
 const fs = require("fs");
-var multer = require("multer");
-var upload = multer({ dest: "uploads/" });
-var ipfsAPI = require("ipfs-api");
-
+const multer = require("multer");
+const upload = multer({ dest: "uploads/" });
+const ipfsAPI = require("ipfs-api");
+let port = process.env.PORT || 3003;
 // connect to ipfs daemon API server
-var ipfs = ipfsAPI("ipfs.infura.io", "5001", { protocol: "https" });
+const ipfs = ipfsAPI("ipfs.infura.io", "5001", { protocol: "https" });
 const Web3 = require("web3");
 
 // const web3 = new Web3("http://localhost:8545");
@@ -50,25 +50,27 @@ const abi = [
   },
 ];
 
-var myContract = new web3.eth.Contract(abi, contractAddress);
+const myContract = new web3.eth.Contract(abi, contractAddress);
 
 // console.log(ipfs);
-
-app.get("/", function (req, res) {
-  //   res.send('Hello World')
-  //res.send("Ipfs + infura ");
-  res.sendFile(__dirname + "/public/index.html");
-});
+app.use(express.static("public"));
+//app.get("/", function (req, res) {
+//     res.send('Hello World')
+//  res.send("Ipfs + infura ");
+//
+//  res.sendFile(__dirname + "/public/index.html");
+//})
 app.post("/profile", upload.single("avatar"), function (req, res, next) {
   // req.file is the `avatar` file
   // req.body will hold the text fields, if there were any
-  console.log(req.file);
+  //console.log(req.file);
   var data = new Buffer(fs.readFileSync(req.file.path));
   ipfs.files.add(data, function (err, res1) {
     console.log(res1);
+    res.send(res1);
     var encodedData = myContract.methods.setWord(res1[0].hash).encodeABI();
-    console.log(encodedData);
-
+    //console.log(encodedData);
+    // res.send(encodedData);
     let transactionObject = {
       gas: "470000",
       data: encodedData,
@@ -83,16 +85,17 @@ app.post("/profile", upload.single("avatar"), function (req, res, next) {
       if (err) {
         console.log(err);
       }
-      console.log(trans);
+      //console.log(trans);
+      // res.send(trans);
       web3.eth
         .sendSignedTransaction(trans.rawTransaction)
         .on("receipt", function (result) {
-          console.log(receipt);
+          // console.log(receipt);
+
           res.send(res1);
         });
     });
   });
-  // res.send(req.file);
 });
 app.get("/download", function (req, res) {
   myContract.methods
@@ -104,4 +107,6 @@ app.get("/download", function (req, res) {
       res.redirect("https://ipfs.io/ipfs/" + result);
     });
 });
-app.listen(3001);
+app.listen(port, () => {
+  console.log(`listen on http://localhost:${port}`);
+});
